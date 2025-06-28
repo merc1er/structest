@@ -8,7 +8,7 @@ conventions and match the structure of your source code.
 You can install Structest using pip:
 
 ```bash
-pip install .
+pip install structest
 ```
 
 And run it with:
