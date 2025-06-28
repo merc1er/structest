@@ -1,7 +1,7 @@
 # Structest
 
-Structest is a lightweight Python library that checks that your tests match the standard
-test files naming patterns.
+Lightweight Python library that ensures your test files follow standard naming
+conventions and match the structure of your source code.
 
 ## Installation
 
