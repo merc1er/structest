@@ -13,6 +13,15 @@ pip install structest
 
 # Usage
 
+Structest assumes your project follows the standard project structure:
+
+```
+project/
+  project/   # your main package
+  tests/     # tests directory
+  README.md  # any other files
+```
+
 ```bash
 structest .
 ```
