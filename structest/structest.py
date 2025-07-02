@@ -2,6 +2,8 @@ import argparse
 import os
 import sys
 
+from structest.validators import is_eligible_module
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Check test file structure.")
@@ -22,10 +24,10 @@ def get_dirs(base_path: str) -> list[str]:
 def find_modules(base_dirs: list[str]) -> set[str]:
     modules = set()
     for base_dir in base_dirs:
-        for root, _, files in os.walk(base_dir):
-            for file in files:
-                if file.endswith(".py") and not file.startswith("__"):
-                    modules.add(file)  # Keep full filename with .py
+        for root, _, file_names in os.walk(base_dir):
+            for file_name in file_names:
+                if is_eligible_module(file_name):
+                    modules.add(file_name)
     return modules
 
 
