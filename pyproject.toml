@@ -6,6 +6,13 @@ build-backend = "hatchling.build"
 name = "structest"
 version = "0.0.1"
 readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
 
 [project.scripts]
 structest = "structest:main"
+
+[dependency-groups]
+dev = [
+    "ruff==0.12.2",
+]
