@@ -2,6 +2,9 @@ import argparse
 import os
 import sys
 
+from rich import print
+
+from structest.formatting import print_list_of_files
 from structest.validators import is_eligible_module
 
 
@@ -46,7 +49,7 @@ def main() -> None:
     base_path = args.directory
 
     if not os.path.isdir(base_path):
-        print(f"❌ Directory '{base_path}' does not exist.")
+        print(f"[bold red]Directory '{base_path}' does not exist.[/]")
         sys.exit(1)
 
     source_dirs = get_dirs(base_path)
@@ -57,14 +60,13 @@ def main() -> None:
     extra_tests = tests - modules
 
     if missing_tests:
-        print("❌ Missing tests for:", ", ".join(sorted(missing_tests)))
+        print("[bold red]Missing tests for:[/]")
+        print_list_of_files(missing_tests)
     if extra_tests:
-        print(
-            "❌ Test files without matching modules:",
-            ", ".join(sorted(extra_tests)),
-        )
+        print("[bold red]Test files without matching modules:[/]")
+        print_list_of_files(extra_tests)
     if not missing_tests and not extra_tests:
-        print("✅ All test files are correctly named and mapped.")
+        print("[bold green]All test files are correctly named and mapped.[/]")
 
     if missing_tests or extra_tests:
         sys.exit(1)
