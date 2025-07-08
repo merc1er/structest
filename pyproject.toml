@@ -18,3 +18,7 @@ structest = "structest:main"
 dev = [
     "ruff==0.12.2",
 ]
+
+[tool.ruff]
+line-length = 88
+lint.extend-select = ["I"]
