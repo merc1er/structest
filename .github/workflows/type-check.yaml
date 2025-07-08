@@ -1,0 +1,31 @@
+name: Check types with Pyrefly
+
+on:
+  push:
+    paths:
+      - "**.py"
+      - "pyproject.toml"
+  pull_request:
+    paths:
+      - "**.py"
+      - "pyproject.toml"
+
+jobs:
+  pyrefly-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pyrefly
+        run: |
+          pip install pyrefly
+
+      - name: Run pyrefly type check
+        run: pyrefly check
