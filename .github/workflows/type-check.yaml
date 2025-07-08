@@ -23,6 +23,12 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: uv install --dev
+
       - name: Install pyrefly
         run: |
           pip install pyrefly
