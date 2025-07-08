@@ -30,4 +30,4 @@ jobs:
         run: uv sync
 
       - name: Run pyrefly type check
-        run: pyrefly check
+        run: uvx pyrefly check
