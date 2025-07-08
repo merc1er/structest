@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  push:
+    paths:
+      - "**.py"
+      - "pyproject.toml"
+  pull_request:
+    paths:
+      - "**.py"
+      - "pyproject.toml"
+
+jobs:
+  ruff-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Ruff
+        uses: astral-sh/ruff-action@v3
+
+      - run: ruff format --check .
