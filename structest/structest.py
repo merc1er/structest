@@ -5,7 +5,7 @@ import typer
 from rich import print
 
 from structest.formatting import print_list_of_files
-from structest.validators import is_eligible_module
+from structest.validators import check_directory_exists, is_eligible_module
 
 app = typer.Typer()
 
@@ -14,9 +14,7 @@ app = typer.Typer()
 def path(
     path: Annotated[str, typer.Argument(help="Path to the project's root directory")],
 ) -> None:
-    if not os.path.isdir(path):
-        print(f"[bold red]Directory '{path}' does not exist.[/]")
-        raise typer.Exit(1)
+    check_directory_exists(path)
 
     source_dirs = get_dirs(path)
     modules = find_modules(source_dirs)
