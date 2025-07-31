@@ -10,6 +10,34 @@ from structest.validators import is_eligible_module
 app = typer.Typer()
 
 
+@app.command()
+def path(
+    path: Annotated[str, typer.Argument(help="Path to the project's root directory")],
+) -> None:
+    if not os.path.isdir(path):
+        print(f"[bold red]Directory '{path}' does not exist.[/]")
+        raise typer.Exit(1)
+
+    source_dirs = get_dirs(path)
+    modules = find_modules(source_dirs)
+    tests = find_test_files("tests")
+
+    missing_tests = modules - tests
+    extra_tests = tests - modules
+
+    if missing_tests:
+        print("[bold red]Missing tests for:[/]")
+        print_list_of_files(missing_tests)
+    if extra_tests:
+        print("[bold red]Test files without matching modules:[/]")
+        print_list_of_files(extra_tests)
+    if not missing_tests and not extra_tests:
+        print("[bold green]All test files are correctly named and mapped.[/]")
+
+    if missing_tests or extra_tests:
+        raise typer.Exit(1)
+
+
 def get_dirs(base_path: str) -> list[str]:
     ignore = {"tests", "__pycache__", ".git", ".venv", "venv"}
     result = []
@@ -38,34 +66,6 @@ def find_test_files(test_dir: str) -> set[str]:
                 module_name = file[len("test_") :]  # Keep .py extension
                 tests.add(module_name)
     return tests
-
-
-@app.command()
-def path(
-    path: Annotated[str, typer.Argument(help="Path to the project's root directory")],
-) -> None:
-    if not os.path.isdir(path):
-        print(f"[bold red]Directory '{path}' does not exist.[/]")
-        raise typer.Exit(1)
-
-    source_dirs = get_dirs(path)
-    modules = find_modules(source_dirs)
-    tests = find_test_files("tests")
-
-    missing_tests = modules - tests
-    extra_tests = tests - modules
-
-    if missing_tests:
-        print("[bold red]Missing tests for:[/]")
-        print_list_of_files(missing_tests)
-    if extra_tests:
-        print("[bold red]Test files without matching modules:[/]")
-        print_list_of_files(extra_tests)
-    if not missing_tests and not extra_tests:
-        print("[bold green]All test files are correctly named and mapped.[/]")
-
-    if missing_tests or extra_tests:
-        raise typer.Exit(1)
 
 
 if __name__ == "__main__":
