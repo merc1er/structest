@@ -29,6 +29,8 @@ project/
 structest .
 ```
 
+See a list of examples in the [examples](examples/) directory.
+
 # FAQ
 
 > What source files does structest check?
