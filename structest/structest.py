@@ -18,7 +18,7 @@ def path(
 
     source_dirs = get_dirs(path)
     modules = find_modules(source_dirs)
-    tests = find_test_files("tests")
+    tests = find_test_files(path + "/tests")
 
     missing_tests = modules - tests
     extra_tests = tests - modules
@@ -37,12 +37,13 @@ def path(
 
 
 def get_dirs(base_path: str) -> list[str]:
-    ignore = {"tests", "__pycache__", ".git", ".venv", "venv"}
+    ignore = {"tests", "__pycache__", ".git", ".venv", "venv", ".mypy_cache"}
     result = []
     for directory in os.listdir(base_path):
         full_path = os.path.join(base_path, directory)
         if os.path.isdir(full_path) and directory not in ignore:
             result.append(directory)
+    print("Directories found:", result)
     return result
 
 
@@ -53,6 +54,7 @@ def find_modules(base_dirs: list[str]) -> set[str]:
             for file_name in file_names:
                 if is_eligible_module(file_name):
                     modules.add(file_name)
+    print("Modules found:", modules)
     return modules
 
 
@@ -63,6 +65,7 @@ def find_test_files(test_dir: str) -> set[str]:
             if file.startswith("test_") and file.endswith(".py"):
                 module_name = file[len("test_") :]  # Keep .py extension
                 tests.add(module_name)
+    print("Test files found:", tests)
     return tests
 
 
