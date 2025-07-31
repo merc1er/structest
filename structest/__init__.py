@@ -1,3 +1,3 @@
-from structest.structest import main
+from structest.structest import app
 
-__all__ = ["main"]
+__all__ = ["app"]

@@ -1,17 +1,13 @@
-import argparse
 import os
-import sys
+from typing import Annotated
 
+import typer
 from rich import print
 
 from structest.formatting import print_list_of_files
 from structest.validators import is_eligible_module
 
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Check test file structure.")
-    parser.add_argument("directory", type=str, help="Project root directory")
-    return parser.parse_args()
+app = typer.Typer()
 
 
 def get_dirs(base_path: str) -> list[str]:
@@ -44,15 +40,15 @@ def find_test_files(test_dir: str) -> set[str]:
     return tests
 
 
-def main() -> None:
-    args = parse_args()
-    base_path = args.directory
+@app.command()
+def path(
+    path: Annotated[str, typer.Argument(help="Path to the project's root directory")],
+) -> None:
+    if not os.path.isdir(path):
+        print(f"[bold red]Directory '{path}' does not exist.[/]")
+        raise typer.Exit(1)
 
-    if not os.path.isdir(base_path):
-        print(f"[bold red]Directory '{base_path}' does not exist.[/]")
-        sys.exit(1)
-
-    source_dirs = get_dirs(base_path)
+    source_dirs = get_dirs(path)
     modules = find_modules(source_dirs)
     tests = find_test_files("tests")
 
@@ -69,8 +65,8 @@ def main() -> None:
         print("[bold green]All test files are correctly named and mapped.[/]")
 
     if missing_tests or extra_tests:
-        sys.exit(1)
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":
-    main()
+    app()
