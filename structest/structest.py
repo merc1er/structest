@@ -11,14 +11,23 @@ app = typer.Typer()
 
 
 @app.command()
-def path(
-    path: Annotated[str, typer.Argument(help="Path to the project's root directory")],
+def main(
+    source_directory: Annotated[
+        str,
+        typer.Argument(help="Path to the project's source directory (e.g. 'src/')."),
+    ],
+    tests_directory: Annotated[
+        str,
+        typer.Argument(
+            help="Path to the project's tests directory. This is usually 'tests/'."
+        ),
+    ] = "tests/",
 ) -> None:
-    check_directory_exists(path)
+    check_directory_exists(source_directory)
 
-    source_dirs = get_dirs(path)
+    source_dirs = get_dirs(source_directory)
     modules = find_modules(source_dirs)
-    tests = find_test_files(path + "/tests")
+    tests = find_test_files(tests_directory)
 
     missing_tests = modules - tests
     extra_tests = tests - modules
