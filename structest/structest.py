@@ -27,30 +27,8 @@ def main(
     source_dir_path = resolve_directory(source_directory)
     tests_dir_path = resolve_directory(tests_directory)
 
-    modules = {
-        str(Path(path).with_suffix("").relative_to(source_dir_path).as_posix())
-        for path in list_all_modules(str(source_dir_path))
-        if not Path(path).name.startswith("test_")
-        and not Path(path).name.endswith("_test")
-    }
-
-    print("Modules found:", modules)
-
-    tests = set()
-    for path in list_all_modules(str(tests_dir_path)):
-        test_path = Path(path)
-        if test_path.name.startswith("test_"):
-            try:
-                relative_path = test_path.relative_to(tests_dir_path)
-                stripped_name = test_path.name[len("test_") :]
-                test_module_path = (
-                    relative_path.with_name(stripped_name).with_suffix("").as_posix()
-                )
-                tests.add(test_module_path)
-            except ValueError:
-                continue
-
-    print("Test files found:", tests)
+    modules = collect_modules(source_dir_path)
+    tests = collect_test_modules(tests_dir_path)
 
     missing_tests = modules - tests
     extra_tests = tests - modules
@@ -66,6 +44,43 @@ def main(
 
     if missing_tests or extra_tests:
         raise typer.Exit(1)
+
+
+def collect_test_modules(tests_dir_path: Path) -> set[str]:
+    tests = set()
+    for path in list_all_modules(str(tests_dir_path)):
+        test_path = Path(path)
+        if test_path.name.startswith("test_"):
+            try:
+                relative_path = test_path.relative_to(tests_dir_path)
+                stripped_name = test_path.name[len("test_") :]
+                test_module_path = (
+                    relative_path.with_name(stripped_name).with_suffix("").as_posix()
+                )
+                tests.add(test_module_path)
+            except ValueError:
+                continue
+
+    print("Test files found:", tests)
+    return tests
+
+
+def collect_modules(source_dir_path: Path) -> set[str]:
+    modules = set()
+    for path in list_all_modules(str(source_dir_path)):
+        module_path = Path(path)
+
+        # Skip test files
+        if module_path.name.startswith("test_") or module_path.name.endswith("_test"):
+            continue
+
+        # Convert to relative path without extension
+        relative_path = module_path.with_suffix("").relative_to(source_dir_path)
+        module_name = relative_path.as_posix()
+        modules.add(module_name)
+
+    print("Modules found:", modules)
+    return modules
 
 
 if __name__ == "__main__":
