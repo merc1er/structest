@@ -23,7 +23,6 @@ def main(
         ),
     ] = "tests/",
 ) -> None:
-
     source_dir_path = resolve_directory(source_directory)
     tests_dir_path = resolve_directory(tests_directory)
 
