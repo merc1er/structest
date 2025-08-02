@@ -14,33 +14,17 @@ You can install Structest using pip:
 pip install structest
 ```
 
-# Usage
-
-Structest assumes your project follows the standard project structure:
-
-```
-project/
-  project/   # your main package
-  tests/     # tests directory
-  README.md  # any other files
-```
+or using uv:
 
 ```bash
-structest .
+uv add structest
 ```
 
-See a list of examples in the [examples](examples/) directory.
+# Usage
 
-# FAQ
+This project is in active early development, so use the --help flag to see available
+options and commands:
 
-> What source files does structest check?
-
-Any regular Python module. It does **not** check files that start with an underscore,
-such as `__init__.py`, or files that start with `test_` or end with `_test.py`.
-
-Look at the `is_eligible_module()` function in the source code for the exact criteria.
-
-> What test files does structest check?
-
-Test files should be located in a `tests/` directory and should follow the naming
-convention `test_<module_name>.py` or `<module_name>_test.py`.
+```bash
+structest --help
+```
