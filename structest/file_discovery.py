@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+from structest.validators import check_directory_exists
+
 IGNORED_DIRS = {
     "__pycache__",
     "venv",
@@ -24,3 +26,12 @@ def list_all_modules(path: str) -> list[str]:
                 all_files.append(str(full_path.resolve()))
 
     return all_files
+
+
+def resolve_directory(path: str) -> Path:
+    """Resolve the given path to an absolute path."""
+
+    check_directory_exists(path)
+    dir_path = Path(path).resolve()
+    print(f"Directory: [bold]{dir_path}[/]")
+    return dir_path

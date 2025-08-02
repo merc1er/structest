@@ -4,9 +4,8 @@ from typing import Annotated
 import typer
 from rich import print
 
-from structest.file_discovery import list_all_modules
+from structest.file_discovery import list_all_modules, resolve_directory
 from structest.formatting import print_list_of_files
-from structest.validators import check_directory_exists
 
 app = typer.Typer()
 
@@ -24,14 +23,9 @@ def main(
         ),
     ] = "tests/",
 ) -> None:
-    check_directory_exists(source_directory)
-    check_directory_exists(tests_directory)
 
-    source_dir_path = Path(source_directory).resolve()
-    tests_dir_path = Path(tests_directory).resolve()
-
-    print(f"Source directory: [bold]{source_dir_path}[/]")
-    print(f"Tests directory: [bold]{tests_dir_path}[/]")
+    source_dir_path = resolve_directory(source_directory)
+    tests_dir_path = resolve_directory(tests_directory)
 
     modules = {
         str(Path(path).with_suffix("").relative_to(source_dir_path).as_posix())
