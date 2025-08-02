@@ -27,21 +27,35 @@ def main(
     check_directory_exists(source_directory)
     check_directory_exists(tests_directory)
 
-    modules = {
-        Path(path).name
-        for path in list_all_modules(source_directory)
-        if not Path(path).name.startswith("__")
-        and not Path(path).name.startswith("test_")
-        and not Path(path).name.endswith("_test.py")
-    }
+    source_dir_path = Path(source_directory).resolve()
+    tests_dir_path = Path(tests_directory).resolve()
 
-    tests = {
-        Path(path).name[len("test_") :]
-        for path in list_all_modules(tests_directory)
-        if Path(path).name.startswith("test_")
+    print(f"Source directory: [bold]{source_dir_path}[/]")
+    print(f"Tests directory: [bold]{tests_dir_path}[/]")
+
+    modules = {
+        str(Path(path).with_suffix("").relative_to(source_dir_path).as_posix())
+        for path in list_all_modules(str(source_dir_path))
+        if not Path(path).name.startswith("test_")
+        and not Path(path).name.endswith("_test")
     }
 
     print("Modules found:", modules)
+
+    tests = set()
+    for path in list_all_modules(str(tests_dir_path)):
+        test_path = Path(path)
+        if test_path.name.startswith("test_"):
+            try:
+                relative_path = test_path.relative_to(tests_dir_path)
+                stripped_name = test_path.name[len("test_") :]
+                test_module_path = (
+                    relative_path.with_name(stripped_name).with_suffix("").as_posix()
+                )
+                tests.add(test_module_path)
+            except ValueError:
+                continue
+
     print("Test files found:", tests)
 
     missing_tests = modules - tests
