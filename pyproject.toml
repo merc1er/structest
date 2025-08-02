@@ -8,15 +8,16 @@ version = "0.0.1"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "rich==14.0.0",
+    "typer==0.16.0",
 ]
 
 [project.scripts]
-structest = "structest:main"
+structest = "structest:app"
 
 [dependency-groups]
 dev = [
     "pyrefly==0.23.0",
+    "pytest==8.4.1",
     "ruff==0.12.2",
 ]
 

@@ -1,60 +1,33 @@
-import argparse
-import os
-import sys
+from pathlib import Path
+from typing import Annotated
 
+import typer
 from rich import print
 
+from structest.file_discovery import list_all_modules, resolve_directory
 from structest.formatting import print_list_of_files
-from structest.validators import is_eligible_module
+
+app = typer.Typer()
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Check test file structure.")
-    parser.add_argument("directory", type=str, help="Project root directory")
-    return parser.parse_args()
+@app.command()
+def main(
+    source_directory: Annotated[
+        str,
+        typer.Argument(help="Path to the project's source directory (e.g. 'src/')."),
+    ],
+    tests_directory: Annotated[
+        str,
+        typer.Argument(
+            help="Path to the project's tests directory. This is usually 'tests/'."
+        ),
+    ] = "tests/",
+) -> None:
+    source_dir_path = resolve_directory(source_directory)
+    tests_dir_path = resolve_directory(tests_directory)
 
-
-def get_dirs(base_path: str) -> list[str]:
-    ignore = {"tests", "__pycache__", ".git", ".venv", "venv"}
-    result = []
-    for directory in os.listdir(base_path):
-        full_path = os.path.join(base_path, directory)
-        if os.path.isdir(full_path) and directory not in ignore:
-            result.append(directory)
-    return result
-
-
-def find_modules(base_dirs: list[str]) -> set[str]:
-    modules = set()
-    for base_dir in base_dirs:
-        for root, _, file_names in os.walk(base_dir):
-            for file_name in file_names:
-                if is_eligible_module(file_name):
-                    modules.add(file_name)
-    return modules
-
-
-def find_test_files(test_dir: str) -> set[str]:
-    tests = set()
-    for root, _, files in os.walk(test_dir):
-        for file in files:
-            if file.startswith("test_") and file.endswith(".py"):
-                module_name = file[len("test_") :]  # Keep .py extension
-                tests.add(module_name)
-    return tests
-
-
-def main() -> None:
-    args = parse_args()
-    base_path = args.directory
-
-    if not os.path.isdir(base_path):
-        print(f"[bold red]Directory '{base_path}' does not exist.[/]")
-        sys.exit(1)
-
-    source_dirs = get_dirs(base_path)
-    modules = find_modules(source_dirs)
-    tests = find_test_files("tests")
+    modules = collect_modules(source_dir_path)
+    tests = collect_test_modules(tests_dir_path)
 
     missing_tests = modules - tests
     extra_tests = tests - modules
@@ -69,8 +42,45 @@ def main() -> None:
         print("[bold green]All test files are correctly named and mapped.[/]")
 
     if missing_tests or extra_tests:
-        sys.exit(1)
+        raise typer.Exit(1)
+
+
+def collect_test_modules(tests_dir_path: Path) -> set[str]:
+    tests = set()
+    for path in list_all_modules(str(tests_dir_path)):
+        test_path = Path(path)
+        if test_path.name.startswith("test_"):
+            try:
+                relative_path = test_path.relative_to(tests_dir_path)
+                stripped_name = test_path.name[len("test_") :]
+                test_module_path = (
+                    relative_path.with_name(stripped_name).with_suffix("").as_posix()
+                )
+                tests.add(test_module_path)
+            except ValueError:
+                continue
+
+    print("Test files found:", tests)
+    return tests
+
+
+def collect_modules(source_dir_path: Path) -> set[str]:
+    modules = set()
+    for path in list_all_modules(str(source_dir_path)):
+        module_path = Path(path)
+
+        # Skip test files
+        if module_path.name.startswith("test_") or module_path.name.endswith("_test"):
+            continue
+
+        # Convert to relative path without extension
+        relative_path = module_path.with_suffix("").relative_to(source_dir_path)
+        module_name = relative_path.as_posix()
+        modules.add(module_name)
+
+    print("Modules found:", modules)
+    return modules
 
 
 if __name__ == "__main__":
-    main()
+    app()
