@@ -1,9 +1,11 @@
 from pathlib import Path
 
 import pytest
-from typer.testing import CliRunner, Result
+from typer.testing import CliRunner
 
 from structest.cli import app
+
+from .assertions import assert_all_tests_mapped
 
 runner = CliRunner()
 
@@ -17,7 +19,7 @@ class TestFolderAtTheRoot:
 
         result = runner.invoke(app, [str(src), str(tests)])
 
-        self._assert_correct_result(result)
+        assert_all_tests_mapped(result)
 
     @pytest.mark.skip(reason="Feature not implemented yet")
     def test_tests_directory_omitted(self) -> None:
@@ -26,12 +28,4 @@ class TestFolderAtTheRoot:
 
         result = runner.invoke(app, [str(src)])
 
-        self._assert_correct_result(result)
-
-    @staticmethod
-    def _assert_correct_result(result: Result) -> None:
-        # The expected behavior: no output to stderr, green message saying all tests
-        # are mapped.
-        assert result.exit_code == 0
-        assert "All test files are correctly named and mapped." in result.stdout
-        assert not result.stderr
+        assert_all_tests_mapped(result)
