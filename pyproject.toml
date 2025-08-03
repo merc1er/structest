@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-structest = "structest:app"
+structest = "structest.cli:app"
 
 [dependency-groups]
 dev = [

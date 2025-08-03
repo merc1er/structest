@@ -80,7 +80,3 @@ def collect_modules(source_dir_path: Path) -> set[str]:
 
     print("Modules found:", modules)
     return modules
-
-
-if __name__ == "__main__":
-    app()
