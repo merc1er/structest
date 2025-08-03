@@ -43,5 +43,7 @@ class TestListAllModules:
         symlink.symlink_to(real_file)
 
         result = list_all_modules(str(tmp_path))
-        assert str(real_file) in result
-        assert str(symlink) in result
+
+        result_paths = {Path(p) for p in result}
+        assert real_file in result_paths
+        assert symlink.resolve() in result_paths
