@@ -33,4 +33,5 @@ class TestFolderAtTheRoot:
         # The expected behavior: no output to stderr, green message saying all tests
         # are mapped.
         assert result.exit_code == 0
-        assert "All test files are correctly named and mapped." in result.output
+        assert "All test files are correctly named and mapped." in result.stdout
+        assert not result.stderr
